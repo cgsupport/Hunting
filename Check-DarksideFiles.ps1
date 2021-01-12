@@ -102,11 +102,13 @@ foreach ($file in ($filesToCheck | where-object{$_.length -ge 144})) {
        
     $encFile = $file.FullName
 
-    #  Get last 144 bytes of files containing 128 byte RSA encrypted Salsa decryption key and 16 byte hash checksum
+    #  Get last 144 bytes of files containing 128 byte RSA encrypted Salsa decryption key and 16 byte hash checksum of the decryption key
     $lastBytes = Get-Content -LiteralPath ("$encFile") -Encoding Byte -tail 144
 
     $RSAsalsaKey = $lastBytes[0..127]
     $checksumHash = $lastBytes[128..143]
+    
+    # Calculate checksum hash of the RSA encrypted salsa decryption key using 5 rounds of CRC32
     
     # 1st CRC32 round using initial CRC value of 3735928559 (0xDEADBEEF)
     $CRC32_1 = Get-CRC32 -InitialCRC $initialCRC -Buffer $RSAsalsaKey
