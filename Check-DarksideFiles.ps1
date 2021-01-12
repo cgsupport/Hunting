@@ -123,15 +123,15 @@ foreach ($file in ($filesToCheck | where-object{$_.length -ge 144})) {
     $CRC32_4 = Get-CRC32 -InitialCRC $CRC32_3 -Buffer $RSAsalsaKey
     $hash_3 = [System.BitConverter]::GetBytes($CRC32_4)
 
-    # 5th CRC32 round using CRC32 from 4th round as initial value, convert to byte array for third 4 bytes of checksum hash
+    # 5th CRC32 round using CRC32 from 4th round as initial value, convert to byte array for fourth 4 bytes of checksum hash
     $CRC32_5 = Get-CRC32 -InitialCRC $CRC32_4 -Buffer $RSAsalsaKey
     $hash_4 = [System.BitConverter]::GetBytes($CRC32_5)
 
-    # join together 16 byte checksun hash and convert to an easy to read hex string
+    # join together 4 x 4 byte CRC32 hashes to generate 16 byte checksun hash and convert to an easy to read hex string
     $calculatedHashBytes = $hash_1 + $hash_2 + $hash_3 + $hash_4
     $calculatedHashHex = [System.BitConverter]::ToString($calculatedHashBytes)
 
-    # Get Salsa key hash stored in file
+    # Convert the checksum read from the file to an easy to read hex string
     $actualHashHex = [System.BitConverter]::ToString($checksumHash)
 
     # check if calculated hash matches hash stored in file
